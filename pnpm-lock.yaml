@@ -1,0 +1,13 @@
+dependencies:
+  blessed: 0.1.81
+lockfileVersion: 5.1
+packages:
+  /blessed/0.1.81:
+    dev: false
+    engines:
+      node: '>= 0.8.0'
+    hasBin: true
+    resolution:
+      integrity: sha1-+WLWh+wsNpVwrnGvhDJW5tDKESk=
+specifiers:
+  blessed: ^0.1.81
