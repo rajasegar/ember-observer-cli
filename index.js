@@ -139,9 +139,14 @@ const rsaList = blessed.list({
 fetch(rsaUrl)
   .then((res) => res.json())
   .then((json) => {
-    const items = json.data.map((a, index) => {
-      const { name, description, 'updated-at': updatedAt } = a.attributes;
-      let str = '{red-fg}#' + (index + 1) + '{/red-fg} ';
+    const items = json.data.map((a) => {
+      const {
+        name,
+        description,
+        score,
+        'updated-at': updatedAt,
+      } = a.attributes;
+      let str = '{red-fg}' + score + '{/red-fg} ';
       str += '{yellow-fg}{bold}' + name + '{/} ';
       str += description;
       str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
@@ -173,7 +178,7 @@ const newList = blessed.list({
       },
     },
   },
-  label: 'Recently Scored Addons',
+  label: 'New Addons',
   keys: true,
   vi: true,
   tags: true,
@@ -182,9 +187,9 @@ const newList = blessed.list({
 fetch(newAddonsUrl)
   .then((res) => res.json())
   .then((json) => {
-    const items = json.data.map((a, index) => {
+    const items = json.data.map((a) => {
       const { name, description, 'updated-at': updatedAt } = a.attributes;
-      let str = '{red-fg}#' + (index + 1) + '{/red-fg} ';
+      let str = '{red-fg}[?]{/red-fg} ';
       str += '{yellow-fg}{bold}' + name + '{/} ';
       str += description;
       str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
