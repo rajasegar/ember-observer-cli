@@ -1,7 +1,12 @@
 const blessed = require('blessed');
-const fetch = require('node-fetch');
 
 const screen = blessed.screen({ fullUnicode: true });
+
+const topAddonsList = require('./src/widgets/topAddonsList')(screen);
+const navbar = require('./src/widgets/navbar')(screen);
+const rsaList = require('./src/widgets/rsaList')(screen);
+const newList = require('./src/widgets/newAddonsList')(screen);
+const createMainWidget = require('./src/pages/addon/widgets/main');
 
 const header = blessed.box({
   parent: screen,
@@ -16,189 +21,6 @@ const header = blessed.box({
   },
 });
 
-const categoriesUrl =
-  'https://emberobserver.com/api/v2/categories?include=subcategories,parent';
-
-const topAddonsUrl =
-  'https://emberobserver.com/api/v2/addons?filter[top]=true&include=categories&page[limit]=10&sort=ranking';
-
-const rsaUrl =
-  'https://emberobserver.com/api/v2/addons?filter[recentlyReviewed]=true&include=categories&page[limit]=10';
-
-const newAddonsUrl =
-  'https://emberobserver.com/api/v2/addons?include=categories&page[limit]=10&sort=-publishedDate';
-
-const navbar = blessed.list({
-  parent: screen,
-  top: '10%+1',
-  left: 0,
-  width: '30%',
-  height: '90%',
-  border: {
-    type: 'line',
-    fg: 'white',
-  },
-  label: 'Categories',
-  keys: true,
-  vi: true,
-  style: {
-    selected: {
-      fg: 'black',
-      bg: 'white',
-    },
-    focus: {
-      border: {
-        fg: 'yellow',
-      },
-    },
-  },
-  tags: true,
-});
-
-fetch(categoriesUrl)
-  .then((res) => res.json())
-  .then((json) => {
-    const items = json.data.map((j) => {
-      const { name, 'addon-count': addonCount } = j.attributes;
-      return `${name} (${addonCount})`;
-    });
-    navbar.setItems(items);
-    screen.render();
-  });
-
-const topAddonsList = blessed.list({
-  parent: screen,
-  top: '10%+1',
-  left: '30%+1',
-  width: '70%',
-  height: '30%',
-  border: {
-    type: 'line',
-    fg: 'white',
-  },
-  style: {
-    selected: {
-      fg: 'black',
-      bg: 'white',
-    },
-    focus: {
-      border: {
-        fg: 'yellow',
-      },
-    },
-  },
-  label: 'Top Addons',
-  keys: true,
-  vi: true,
-  tags: true,
-});
-
-fetch(topAddonsUrl)
-  .then((res) => res.json())
-  .then((json) => {
-    const items = json.data.map((a, index) => {
-      const { name, description, 'updated-at': updatedAt } = a.attributes;
-      let str = '{red-fg}#' + (index + 1) + '{/red-fg} ';
-      str += '{yellow-fg}{bold}' + name + '{/} ';
-      str += description;
-      str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
-      return str;
-    });
-    topAddonsList.setItems(items);
-    screen.render();
-  });
-
-// Recently Scored Addons List
-const rsaList = blessed.list({
-  parent: screen,
-  top: '40%+1',
-  left: '30%+1',
-  width: '70%',
-  height: '30%',
-  border: {
-    type: 'line',
-    fg: 'white',
-  },
-  style: {
-    selected: {
-      fg: 'black',
-      bg: 'white',
-    },
-    focus: {
-      border: {
-        fg: 'yellow',
-      },
-    },
-  },
-  label: 'Recently Scored Addons',
-  keys: true,
-  vi: true,
-  tags: true,
-});
-
-fetch(rsaUrl)
-  .then((res) => res.json())
-  .then((json) => {
-    const items = json.data.map((a) => {
-      const {
-        name,
-        description,
-        score,
-        'updated-at': updatedAt,
-      } = a.attributes;
-      let str = '{red-fg}' + score + '{/red-fg} ';
-      str += '{yellow-fg}{bold}' + name + '{/} ';
-      str += description;
-      str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
-      return str;
-    });
-    rsaList.setItems(items);
-    screen.render();
-  });
-
-// New  Addons List
-const newList = blessed.list({
-  parent: screen,
-  top: '70%+1',
-  left: '30%+1',
-  width: '70%',
-  height: '30%',
-  border: {
-    type: 'line',
-    fg: 'white',
-  },
-  style: {
-    selected: {
-      fg: 'black',
-      bg: 'white',
-    },
-    focus: {
-      border: {
-        fg: 'yellow',
-      },
-    },
-  },
-  label: 'New Addons',
-  keys: true,
-  vi: true,
-  tags: true,
-});
-
-fetch(newAddonsUrl)
-  .then((res) => res.json())
-  .then((json) => {
-    const items = json.data.map((a) => {
-      const { name, description, 'updated-at': updatedAt } = a.attributes;
-      let str = '{red-fg}[?]{/red-fg} ';
-      str += '{yellow-fg}{bold}' + name + '{/} ';
-      str += description;
-      str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
-      return str;
-    });
-    newList.setItems(items);
-    screen.render();
-  });
-
 screen.key(['q'], () => {
   return process.exit(0); // eslint-disable-line
 });
@@ -208,8 +30,39 @@ navbar.key('tab', () => {
 });
 
 topAddonsList.key('tab', () => {
+  rsaList.focus();
+});
+rsaList.key('tab', () => {
+  newList.focus();
+});
+newList.key('tab', () => {
   navbar.focus();
 });
+
+topAddonsList.on('select', gotoAddonPage);
+rsaList.on('select', gotoAddonPage);
+newList.on('select', gotoAddonPage);
+
+function gotoAddonPage(node) {
+  const { content } = node;
+  const addonNameRegex = /{bold}([a-zA-Z-@/]*){\/}/;
+  let matches = content.match(addonNameRegex);
+  if (matches.length > 0 && matches[1]) {
+    hideAll();
+    const { info, sidebar } = createMainWidget(screen, matches[1]);
+    screen.append(info);
+    screen.append(sidebar);
+    screen.render();
+  }
+}
+
+function hideAll() {
+  topAddonsList.detach();
+  navbar.detach();
+  rsaList.detach();
+  newList.detach();
+  screen.render();
+}
 
 screen.append(header);
 screen.append(navbar);

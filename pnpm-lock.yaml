@@ -1,5 +1,6 @@
 dependencies:
   blessed: 0.1.81
+  dayjs: 1.8.33
   node-fetch: 2.6.0
 devDependencies:
   eslint: 7.6.0
@@ -181,6 +182,10 @@ packages:
       node: '>= 8'
     resolution:
       integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==
+  /dayjs/1.8.33:
+    dev: false
+    resolution:
+      integrity: sha512-881TDLZCdpJFKbraWRHcUG8zfMLLX400ENf9rFZDuWc5zYMss6xifo2PhlDX0ftOmR2NRmaIY47bAa4gKQfXqw==
   /debug/4.1.1:
     dependencies:
       ms: 2.1.2
@@ -860,6 +865,7 @@ packages:
       integrity: sha512-/lg70HAjtkUgWPVZhZcm+T4hkL8Zbtp1nFNOn3lRrxnlv50SRBv7cR7RqR+GMsd3hUXy9hWBo4CHTbFTcOYwig==
 specifiers:
   blessed: ^0.1.81
+  dayjs: ^1.8.33
   eslint: ^7.6.0
   eslint-config-prettier: ^6.11.0
   eslint-plugin-node: ^11.1.0

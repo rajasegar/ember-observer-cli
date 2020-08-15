@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "blessed": "^0.1.81",
+    "dayjs": "^1.8.33",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
