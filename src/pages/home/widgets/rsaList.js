@@ -3,7 +3,10 @@
 const blessed = require('blessed');
 const fetch = require('node-fetch');
 const getScoreColor = require('../../../utils/getScoreColor');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs/plugin/relativeTime');
 
+dayjs.extend(relativeTime);
 module.exports = function (screen) {
   const rsaUrl =
     'https://emberobserver.com/api/v2/addons?filter[recentlyReviewed]=true&include=categories&page[limit]=10';
@@ -46,11 +49,19 @@ module.exports = function (screen) {
           score,
           'updated-at': updatedAt,
         } = a.attributes;
+
+        const categories = a.relationships.categories.data.map((c) => c.id);
+
         const scoreColor = getScoreColor(score);
         let str = `{${scoreColor}-fg}${score}{/} `;
         str += '{yellow-fg}{bold}' + name + '{/} ';
         str += description;
-        str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
+        const category = json.included
+          .filter((c) => categories.includes(c.id))
+          .map((c) => c.attributes.name)
+          .join(',');
+        str += ` {cyan-fg}{bold}${category}{/} `;
+        str += 'Last Updated ' + dayjs(updatedAt).fromNow();
         return str;
       });
       rsaList.setItems(items);

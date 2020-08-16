@@ -2,6 +2,10 @@
 
 const blessed = require('blessed');
 const fetch = require('node-fetch');
+const dayjs = require('dayjs');
+const relativeTime = require('dayjs');
+
+dayjs.extend(relativeTime);
 
 module.exports = function (screen) {
   const newAddonsUrl =
@@ -39,11 +43,17 @@ module.exports = function (screen) {
     .then((res) => res.json())
     .then((json) => {
       const items = json.data.map((a) => {
-        const { name, description, 'updated-at': updatedAt } = a.attributes;
+        const {
+          name,
+          description,
+          'latest-version-date': updatedAt,
+        } = a.attributes;
+
         let str = '{red-fg}[?]{/red-fg} ';
         str += '{yellow-fg}{bold}' + name + '{/} ';
         str += description;
-        str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
+        str +=
+          ' {cyan-fg}{bold}Last Updated ' + dayjs(updatedAt).fromNow() + '{/}';
         return str;
       });
       newList.setItems(items);

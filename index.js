@@ -2,7 +2,7 @@ const blessed = require('blessed');
 
 const screen = blessed.screen({ fullUnicode: true });
 
-const homePage = require('./src/pages/home')(screen);
+const inithomePage = require('./src/pages/home');
 const initSearchPage = require('./src/pages/search');
 
 const header = blessed.box({
@@ -47,6 +47,8 @@ const text = blessed.textbox({
   name: 'text',
   inputOnFocus: true,
 });
+
+const homePage = inithomePage(screen);
 
 text.key('tab', () => {
   homePage.navbar.focus();
