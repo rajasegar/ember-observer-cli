@@ -2,18 +2,15 @@ const blessed = require('blessed');
 
 const screen = blessed.screen({ fullUnicode: true });
 
-const topAddonsList = require('./src/widgets/topAddonsList')(screen);
-const navbar = require('./src/widgets/navbar')(screen);
-const rsaList = require('./src/widgets/rsaList')(screen);
-const newList = require('./src/widgets/newAddonsList')(screen);
-const createMainWidget = require('./src/pages/addon/widgets/main');
+const homePage = require('./src/pages/home')(screen);
+const initSearchPage = require('./src/pages/search');
 
 const header = blessed.box({
   parent: screen,
   content: 'Ember Observer CLI',
   top: 0,
   left: 0,
-  width: '100%',
+  width: '30%',
   height: '10%',
   border: {
     type: 'line',
@@ -21,55 +18,63 @@ const header = blessed.box({
   },
 });
 
+const searchBox = blessed.form({
+  parent: screen,
+  top: 0,
+  left: '30%+1',
+  width: '70%',
+  height: '10%',
+  border: {
+    type: 'line',
+    fg: 'white',
+  },
+  content: 'Search addons',
+  keys: true,
+});
+const text = blessed.textbox({
+  parent: searchBox,
+  mouse: true,
+  keys: true,
+  fg: 'white',
+  border: {
+    type: 'line',
+    fg: 'white',
+  },
+  height: 3,
+  width: 80,
+  left: 1,
+  top: 1,
+  name: 'text',
+  inputOnFocus: true,
+});
+
+text.key('tab', () => {
+  homePage.navbar.focus();
+});
+
+text.on('submit', (data) => {
+  if (data) {
+    // search addon
+    const searchPage = initSearchPage(screen, data);
+
+    homePage.hide();
+    screen.append(searchPage);
+    text.clearValue();
+    screen.render();
+    searchPage.focus();
+  }
+});
+
 screen.key(['q'], () => {
   return process.exit(0); // eslint-disable-line
 });
 
-navbar.key('tab', () => {
-  topAddonsList.focus();
+screen.key(['/'], () => {
+  text.focus();
 });
-
-topAddonsList.key('tab', () => {
-  rsaList.focus();
-});
-rsaList.key('tab', () => {
-  newList.focus();
-});
-newList.key('tab', () => {
-  navbar.focus();
-});
-
-topAddonsList.on('select', gotoAddonPage);
-rsaList.on('select', gotoAddonPage);
-newList.on('select', gotoAddonPage);
-
-function gotoAddonPage(node) {
-  const { content } = node;
-  const addonNameRegex = /{bold}([a-zA-Z-@/]*){\/}/;
-  let matches = content.match(addonNameRegex);
-  if (matches.length > 0 && matches[1]) {
-    hideAll();
-    const { info, sidebar } = createMainWidget(screen, matches[1]);
-    screen.append(info);
-    screen.append(sidebar);
-    screen.render();
-  }
-}
-
-function hideAll() {
-  topAddonsList.detach();
-  navbar.detach();
-  rsaList.detach();
-  newList.detach();
-  screen.render();
-}
 
 screen.append(header);
-screen.append(navbar);
-screen.append(topAddonsList);
-screen.append(rsaList);
-screen.append(newList);
+screen.append(searchBox);
+homePage.show();
 
-navbar.focus();
-
-screen.render();
+module.exports = screen;

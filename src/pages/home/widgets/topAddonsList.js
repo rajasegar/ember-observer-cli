@@ -4,13 +4,12 @@ const blessed = require('blessed');
 const fetch = require('node-fetch');
 
 module.exports = function (screen) {
-  const rsaUrl =
-    'https://emberobserver.com/api/v2/addons?filter[recentlyReviewed]=true&include=categories&page[limit]=10';
+  const topAddonsUrl =
+    'https://emberobserver.com/api/v2/addons?filter[top]=true&include=categories&page[limit]=10&sort=ranking';
 
-  // Recently Scored Addons List
-  const rsaList = blessed.list({
+  const topAddonsList = blessed.list({
     parent: screen,
-    top: '40%+1',
+    top: '10%+1',
     left: '30%+1',
     width: '70%',
     height: '30%',
@@ -29,31 +28,26 @@ module.exports = function (screen) {
         },
       },
     },
-    label: 'Recently Scored Addons',
+    label: 'Top Addons',
     keys: true,
     vi: true,
     tags: true,
   });
 
-  fetch(rsaUrl)
+  fetch(topAddonsUrl)
     .then((res) => res.json())
     .then((json) => {
-      const items = json.data.map((a) => {
-        const {
-          name,
-          description,
-          score,
-          'updated-at': updatedAt,
-        } = a.attributes;
-        let str = '{red-fg}' + score + '{/red-fg} ';
+      const items = json.data.map((a, index) => {
+        const { name, description, 'updated-at': updatedAt } = a.attributes;
+        let str = '{magenta-fg}#' + (index + 1) + '{/} ';
         str += '{yellow-fg}{bold}' + name + '{/} ';
         str += description;
         str += 'unknown' + ' ' + 'Last Updated ' + updatedAt;
         return str;
       });
-      rsaList.setItems(items);
+      topAddonsList.setItems(items);
       screen.render();
     });
 
-  return rsaList;
+  return topAddonsList;
 };

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "bin": {
+    "ember-observer-cli": "bin/cli.js",
+    "eoc": "bin/cli.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,7 +16,9 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "dayjs": "^1.8.33",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "node-pty": "^0.9.0",
+    "term.js": "^0.0.7"
   },
   "devDependencies": {
     "eslint": "^7.6.0",
