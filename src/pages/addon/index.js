@@ -6,11 +6,19 @@ const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const Terminal = require('../../widgets/terminal');
 const getScoreColor = require('../../utils/getScoreColor');
+const os = require('os');
+const { exec } = require('child_process');
 
 module.exports = function (screen, addon) {
+  let demoUrl = '';
+  let repoUrl = '';
+  let npmUrl = `https://npmjs.com/package/${addon}`;
   dayjs.extend(relativeTime);
   const addonUrl = `https://emberobserver.com/api/v2/addons?filter[name]=${addon}&include=versions,maintainers,keywords,latest-review,latest-review.version,latest-addon-version,categories&page[limit]=1`;
 
+  let openCommand = 'open';
+  if (os.platform() === 'win32') openCommand = 'start';
+  if (os.platform() === 'linux') openCommand = 'xdg-open';
   const info = blessed.box({
     parent: screen,
     top: '10%+1',
@@ -121,19 +129,28 @@ module.exports = function (screen, addon) {
       github: {
         keys: ['g'],
         callback: function () {
-          screen.render();
+          if (repoUrl) {
+            exec(`${openCommand} ${repoUrl}`, () => {});
+            screen.render();
+          }
         },
       },
       npm: {
         keys: ['n'],
         callback: function () {
-          screen.render();
+          if (npmUrl) {
+            exec(`${openCommand} ${npmUrl}`, () => {});
+            screen.render();
+          }
         },
       },
       demo: {
         keys: ['d'],
         callback: function () {
-          screen.render();
+          if (demoUrl) {
+            exec(`${openCommand} ${demoUrl}`, () => {});
+            screen.render();
+          }
         },
       },
       home: {
@@ -198,6 +215,9 @@ module.exports = function (screen, addon) {
         'latest-version-date': latestVersion,
       } = attributes;
 
+      demoUrl = attributes['demo-url'];
+      repoUrl = attributes['repository-url'];
+
       let content = `{bold}${name}{/}\n\n`;
       content += `${description}\n\n`;
       if (ranking) {
@@ -238,6 +258,7 @@ module.exports = function (screen, addon) {
       sidebarContent += `${repo}\n`;
       sidebarContent += `-----------------------\n`;
       sidebarContent += `{yellow-fg}package{/}\n`;
+      sidebarContent += `${npmUrl}\n`;
       sidebarContent += `-----------------------\n`;
       sidebarContent += `{yellow-fg}license{/}\n`;
       sidebarContent += `${license}\n`;
