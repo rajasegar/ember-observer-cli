@@ -27,16 +27,16 @@ eoc
 ## Screenshots
 
 ### Home
-[home](screenshots/eoc-home.png)
+![home](screenshots/eoc-home.png)
 
 ### Addon page
-[addon](screenshots/eoc-addon.png)
+![addon](screenshots/eoc-addon.png)
 
 ### Search 
-[search](screenshots/eoc-search.png)
+![search](screenshots/eoc-search.png)
 
 ### Install addon
-[install](screenshots/eoc-install.png)
+![install](screenshots/eoc-install.png)
 
 ## Help
 The following keyboard shortcuts can be used in ember-observer-cli
