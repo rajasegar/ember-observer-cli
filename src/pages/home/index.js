@@ -5,10 +5,17 @@ module.exports = function (screen) {
   const navbar = require('./widgets/navbar')(screen);
   const rsaList = require('./widgets/rsaList')(screen);
   const newList = require('./widgets/newAddonsList')(screen);
+  const createCategoryWidget = require('./widgets/addonsByCategory');
   const initAddonPage = require('../../pages/addon/');
 
+  let addonsByCategory = null;
   navbar.key('tab', () => {
-    topAddonsList.focus();
+    if (addonsByCategory) {
+      addonsByCategory.focus();
+      screen.render();
+    } else {
+      topAddonsList.focus();
+    }
   });
 
   topAddonsList.key('tab', () => {
@@ -24,6 +31,28 @@ module.exports = function (screen) {
   topAddonsList.on('select', gotoAddonPage);
   rsaList.on('select', gotoAddonPage);
   newList.on('select', gotoAddonPage);
+
+  navbar.on('select', (node) => {
+    const { content } = node;
+    const name = content.slice(0, content.indexOf('(') - 1);
+    const category = navbar.categories.find((c) => {
+      return c.attributes.name === name;
+    });
+    addonsByCategory = createCategoryWidget(screen, category.id);
+
+    topAddonsList.detach();
+    rsaList.detach();
+    newList.detach();
+    screen.append(addonsByCategory);
+    screen.render();
+    addonsByCategory.focus();
+
+    addonsByCategory.key('tab', () => {
+      navbar.focus();
+    });
+
+    addonsByCategory.on('select', gotoAddonPage);
+  });
 
   function gotoAddonPage(node) {
     const { content } = node;
@@ -41,6 +70,9 @@ module.exports = function (screen) {
     navbar.detach();
     rsaList.detach();
     newList.detach();
+    if (addonsByCategory) {
+      addonsByCategory.detach();
+    }
     screen.render();
   }
 

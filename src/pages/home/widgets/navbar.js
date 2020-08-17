@@ -12,7 +12,7 @@ module.exports = function (screen) {
     top: '10%+1',
     left: 0,
     width: '30%',
-    height: '90%',
+    height: '90%-3',
     border: {
       type: 'line',
       fg: 'white',
@@ -37,6 +37,7 @@ module.exports = function (screen) {
   fetch(categoriesUrl)
     .then((res) => res.json())
     .then((json) => {
+      navbar.categories = json.data;
       const items = json.data.map((j) => {
         const { name, 'addon-count': addonCount } = j.attributes;
         return `${name} (${addonCount})`;

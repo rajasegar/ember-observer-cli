@@ -48,6 +48,37 @@ const text = blessed.textbox({
   inputOnFocus: true,
 });
 
+const auto = true;
+const footer = blessed.listbar({
+  parent: screen,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: auto ? 'shrink' : 3,
+  mouse: true,
+  keys: true,
+  border: 'line',
+  vi: true,
+  style: {
+    selected: {
+      bg: 'white',
+      fg: 'black',
+    },
+  },
+  commands: {
+    search: {
+      keys: ['/'],
+      callback: function () {
+        screen.render();
+      },
+    },
+    quit: {
+      keys: ['q'],
+      callback: function () {},
+    },
+  },
+});
+
 const homePage = inithomePage(screen);
 
 text.key('tab', () => {
@@ -77,6 +108,7 @@ screen.key(['/'], () => {
 
 screen.append(header);
 screen.append(searchBox);
+screen.append(footer);
 homePage.show();
 
 module.exports = screen;

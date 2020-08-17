@@ -81,18 +81,9 @@ module.exports = function (screen, addon) {
     border: 'line',
     vi: true,
     style: {
-      bg: 'green',
-      item: {
-        bg: 'red',
-        hover: {
-          bg: 'blue',
-        },
-        //focus: {
-        //  bg: 'blue'
-        //}
-      },
       selected: {
-        bg: 'blue',
+        bg: 'white',
+        fg: 'black',
       },
     },
     commands: {

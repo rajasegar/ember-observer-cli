@@ -17,7 +17,7 @@ module.exports = function (screen) {
     top: '70%+1',
     left: '30%+1',
     width: '70%',
-    height: '30%',
+    height: '30%-3',
     border: {
       type: 'line',
       fg: 'white',
