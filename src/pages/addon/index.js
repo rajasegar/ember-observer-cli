@@ -9,6 +9,12 @@ const getScoreColor = require('../../utils/getScoreColor');
 const os = require('os');
 const { exec } = require('child_process');
 
+const _info = require('./widgets/info');
+const _githubWidget = require('./widgets/github');
+const _depsWidget = require('./widgets/deps');
+const _devdepsWidget = require('./widgets/devdeps');
+const _sidebar = require('./widgets/sidebar');
+
 module.exports = function (screen, addon) {
   let demoUrl = '';
   let repoUrl = '';
@@ -19,55 +25,13 @@ module.exports = function (screen, addon) {
   let openCommand = 'open';
   if (os.platform() === 'win32') openCommand = 'start';
   if (os.platform() === 'linux') openCommand = 'xdg-open';
-  const info = blessed.box({
-    parent: screen,
-    top: '10%+1',
-    left: '0',
-    width: '70%',
-    height: '90%-3',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-    },
-    keys: true,
-    tags: true,
-  });
 
-  const sidebar = blessed.box({
-    parent: screen,
-    top: '10%+1',
-    left: '70%+1',
-    width: '30%',
-    height: '90%-3',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-    },
-    keys: true,
-    tags: true,
-  });
+  // Initialize widgets
+  const info = _info(screen, addon);
+  const githubWidget = _githubWidget(screen);
+  const depsWidget = _depsWidget(screen);
+  const devdepsWidget = _devdepsWidget(screen);
+  const sidebar = _sidebar(screen);
 
   const auto = true;
   var bar = blessed.listbar({
@@ -179,15 +143,66 @@ module.exports = function (screen, addon) {
           'latest-commit-date': latestCommit,
         } = attributes;
         let content = '';
-        content += `{bold}Github {/}\n\n`;
-        content += `Open Issues: {blue-fg}${issues}{/}\n\n`;
-        content += `Forks: {blue-fg}${forks}{/}\n\n`;
-        content += `Starred: {blue-fg}${stars}{/}\n\n`;
-        content += `Contributors: \n\n`;
-        content += `latest commit: ${dayjs(latestCommit).fromNow()}\n\n`;
-        content += `first commit: ${dayjs(firstCommit).fromNow()}\n\n`;
+        content += `Open Issues: {blue-fg}${issues}{/}\n`;
+        content += `Forks: {blue-fg}${forks}{/}\n`;
+        content += `Starred: {blue-fg}${stars}{/}\n`;
+        content += `Contributors: \n`;
+        content += `latest commit: {yellow-fg}${dayjs(
+          latestCommit
+        ).fromNow()}{/}\n`;
+        content += `first commit: {yellow-fg}${dayjs(
+          firstCommit
+        ).fromNow()}{/}\n`;
 
         return content;
+      });
+  }
+
+  function fetchDeps(id) {
+    // Show addon dependencies
+    const url = `https://emberobserver.com/api/v2/addon-dependencies?filter[addonVersionId]=${id}&sort=package`;
+
+    return fetch(url)
+      .then((res) => res.json())
+      .then((json) => {
+        const deps = json.data
+          .filter((d) => d.attributes['dependency-type'] === 'dependencies')
+          .map((d) => {
+            return d.attributes.package;
+          });
+
+        const devdeps = json.data
+          .filter((d) => d.attributes['dependency-type'] === 'devDependencies')
+          .map((d) => {
+            return d.attributes.package;
+          });
+
+        return {
+          deps: {
+            content: deps.join('\n'),
+            length: deps.length,
+          },
+          devdeps: {
+            content: devdeps.join('\n'),
+            length: devdeps.length,
+          },
+        };
+      });
+  }
+
+  function fetchDevDeps(id) {
+    // Show addon dependencies
+    const url = `https://emberobserver.com/api/v2/addon-dependencies?filter[addonVersionId]=${id}&sort=package`;
+
+    return fetch(url)
+      .then((res) => res.json())
+      .then((json) => {
+        return json.data
+          .filter((d) => d.attributes['dependency-type'] === 'devDependencies')
+          .map((d) => {
+            return d.attributes.package;
+          })
+          .join('\n');
       });
   }
 
@@ -196,7 +211,6 @@ module.exports = function (screen, addon) {
     .then((json) => {
       const { attributes, id } = json.data[0];
       const {
-        name,
         description,
         ranking,
         score,
@@ -204,36 +218,52 @@ module.exports = function (screen, addon) {
         'repository-url': repo,
         'last-month-downloads': downloads,
         'latest-version-date': latestVersion,
+        'latest-addon-version-id': addonVersion,
       } = attributes;
 
       demoUrl = attributes['demo-url'];
       repoUrl = attributes['repository-url'];
 
-      let content = `{bold}${name}{/}\n\n`;
+      let content = ``;
       content += `${description}\n\n`;
       if (ranking) {
         content += `Ranks #${ranking} of the addons\n\n`;
       }
       content += displayScore(score);
-      content += `{bold}Categories {/}\n\n`;
+      content += `{yellow-fg}Categories {/}\n\n`;
+
+      const categories = json.included.filter((d) => d.type === 'categories');
+
+      content += categories.map((c) => c.attributes.name).join(',');
 
       fetchGithubStats(id).then((ghstats) => {
-        content += ghstats;
-        info.setContent(content);
+        githubWidget.setContent(ghstats);
         screen.render();
       });
 
-      content += '{bold}Review{/}\n';
+      fetchDeps(addonVersion).then((data) => {
+        const { deps, devdeps } = data;
+        depsWidget.setContent(deps.content);
+        depsWidget.setLabel(` Dependencies (${deps.length}) `);
+        devdepsWidget.setContent(devdeps.content);
+        devdepsWidget.setLabel(` Dev Dependencies (${devdeps.length}) `);
+        screen.render();
+      });
+
+      content += '\n{yellow-fg}Review{/}\n';
       content += 'Manually reviewed on <date> for version <version>\n';
       content += 'Are there meaningful tests? {bold}Yes{/}\n';
       content += 'Is the REAMDE filled out? {bold}Yes{/}\n';
       content += 'Does the addon have a build? {bold}Yes{/}\n';
-      content += '{bold}Dependencies{/}\n';
+      content += '{yellow-fg}Dependencies{/}\n';
       content +=
         'Version <version> of this addon depends on the following addons:\n';
 
-      content += '{bold}Dev Dependencies{/}\n';
-      content += '{bold}Dependencies{/}\n';
+      content += '{yellow-fg}Dev Dependencies{/}\n';
+      content += '{yellow-fg}Dependencies{/}\n';
+
+      info.setContent(content);
+      screen.render();
 
       let sidebarContent = `{yellow-fg}{bold}Press "i" to install this addon{/}\n\n`;
 
@@ -254,13 +284,24 @@ module.exports = function (screen, addon) {
       sidebarContent += `{yellow-fg}license{/}\n`;
       sidebarContent += `${license}\n`;
       sidebarContent += `-----------------------\n`;
-      sidebarContent += '{bold}npm keywords{/}\n';
+      sidebarContent += '{yellow-fg}npm keywords{/}\n';
       const keywords = json.included.filter((r) => r.type === 'keywords');
       sidebarContent += keywords.map((k) => k.attributes.keyword).join(',');
 
       sidebarContent += `\n-----------------------\n`;
+
+      // Maintainers
+      const maintainers = json.included.filter((r) => r.type === 'maintainers');
+      sidebarContent += `{yellow-fg}Maintainers (${maintainers.length}){/}\n`;
+      sidebarContent += maintainers
+        .map((v) => {
+          return v.attributes.name;
+        })
+        .join('\n');
+
+      sidebarContent += `\n-----------------------\n`;
       const versions = json.included.filter((r) => r.type === 'versions');
-      sidebarContent += `{bold}Versions (${versions.length}){/}\n`;
+      sidebarContent += `{yellow-fg}Versions (${versions.length}){/}\n`;
       sidebarContent += versions
         .map((v) => {
           const { version, released } = v.attributes;
@@ -277,6 +318,9 @@ module.exports = function (screen, addon) {
     screen.append(info);
     screen.append(sidebar);
     screen.append(bar);
+    screen.append(depsWidget);
+    screen.append(devdepsWidget);
+    screen.append(githubWidget);
     bar.focus();
     screen.render();
   }
@@ -285,6 +329,9 @@ module.exports = function (screen, addon) {
     screen.detach(info);
     screen.detach(sidebar);
     screen.detach(bar);
+    screen.detach(depsWidget);
+    screen.detach(devdepsWidget);
+    screen.detach(githubWidget);
     screen.render();
   }
   return { show, hide };
