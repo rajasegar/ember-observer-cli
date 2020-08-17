@@ -6,6 +6,9 @@
 
 A CLI for [emberobserver.com](https://emberobserver.com), so now you can install your ember addons from the command-line
 
+[Demo](https://www.youtube.com/watch?v=lHOFc9cW37A)
+
+
 ## Install
 ```
 npm install -g ember-observer-cli
