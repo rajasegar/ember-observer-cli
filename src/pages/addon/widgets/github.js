@@ -6,10 +6,10 @@ module.exports = function (screen) {
   const githubWidget = blessed.box({
     parent: screen,
     label: ' {bold}Github{/} ',
-    top: '40%+1',
-    left: '0',
-    width: '70%',
-    height: '30%',
+    top: '10%+1',
+    left: '35%+1',
+    width: '35%',
+    height: '20%',
     border: {
       type: 'line',
       fg: 'white',

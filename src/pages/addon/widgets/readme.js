@@ -1,15 +1,15 @@
 'use strict';
 
-const blessed = require('blessed');
+const contrib = require('blessed-contrib');
 
 module.exports = function (screen) {
-  const depsWidget = blessed.box({
+  const readme = contrib.markdown({
     parent: screen,
-    label: ' Dependencies ',
-    top: '30%+1',
-    left: '35%+1',
-    width: '35%',
-    height: '20%',
+    label: ' README ',
+    top: '50%+1',
+    left: '0',
+    width: '70%',
+    height: '50%-4',
     border: {
       type: 'line',
       fg: 'white',
@@ -26,8 +26,11 @@ module.exports = function (screen) {
       },
     },
     keys: true,
+    vi: true,
+    scrollable: true,
+    alwaysScroll: true,
     tags: true,
   });
 
-  return depsWidget;
+  return readme;
 };

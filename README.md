@@ -51,7 +51,7 @@ Tab => Navigate between different parts of the screen
 In addon info screen
 ```
 i => install the current addon
-g => Go to the repository of the addon
+r => Go to the repository of the addon
 d => Go to the demo page of the addon
 n => Go to the npm page of the addon
 ```
@@ -63,6 +63,9 @@ Press `q` to quit the program from any screen.
 
 ### How do I close the installation terminal once the installation is done?
 Press `Esc` to close the terminal window.
+
+### How do I scroll up/down in some widgets?
+If the scrolling is enabled for that widget and it has the focus, you can use arrow keys (up/down) or vim keys (j/k/gg/G/C-n/C-p) to scroll.
 
 
 

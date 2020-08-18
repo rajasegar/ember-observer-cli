@@ -14,6 +14,7 @@ const _githubWidget = require('./widgets/github');
 const _depsWidget = require('./widgets/deps');
 const _devdepsWidget = require('./widgets/devdeps');
 const _sidebar = require('./widgets/sidebar');
+const _readme = require('./widgets/readme');
 
 module.exports = function (screen, addon) {
   let demoUrl = '';
@@ -32,6 +33,7 @@ module.exports = function (screen, addon) {
   const depsWidget = _depsWidget(screen);
   const devdepsWidget = _devdepsWidget(screen);
   const sidebar = _sidebar(screen);
+  const readme = _readme(screen);
 
   const auto = true;
   var bar = blessed.listbar({
@@ -84,8 +86,8 @@ module.exports = function (screen, addon) {
           terminal.pty.write(`${command}\r\n`);
         },
       },
-      github: {
-        keys: ['g'],
+      repo: {
+        keys: ['r'],
         callback: function () {
           if (repoUrl) {
             exec(`${openCommand} ${repoUrl}`, () => {});
@@ -159,6 +161,16 @@ module.exports = function (screen, addon) {
       });
   }
 
+  function fetchReadme(id) {
+    const url = `https://emberobserver.com/api/v2/addons/${id}/readme`;
+    return fetch(url)
+      .then((res) => res.json())
+      .then((json) => {
+        const { attributes } = json.data;
+        return attributes.contents;
+      });
+  }
+
   function fetchDeps(id) {
     // Show addon dependencies
     const url = `https://emberobserver.com/api/v2/addon-dependencies?filter[addonVersionId]=${id}&sort=package`;
@@ -223,6 +235,11 @@ module.exports = function (screen, addon) {
 
       fetchGithubStats(id).then((ghstats) => {
         githubWidget.setContent(ghstats);
+        screen.render();
+      });
+
+      fetchReadme(id).then((content) => {
+        readme.setMarkdown(content);
         screen.render();
       });
 
@@ -293,6 +310,9 @@ module.exports = function (screen, addon) {
     })
     .catch((err) => console.log(err));
 
+  readme.key('tab', () => sidebar.focus());
+  sidebar.key('tab', () => readme.focus());
+
   function show() {
     screen.append(info);
     screen.append(sidebar);
@@ -300,7 +320,8 @@ module.exports = function (screen, addon) {
     screen.append(depsWidget);
     screen.append(devdepsWidget);
     screen.append(githubWidget);
-    bar.focus();
+    screen.append(readme);
+    readme.focus();
     screen.render();
   }
 
@@ -311,6 +332,7 @@ module.exports = function (screen, addon) {
     screen.detach(depsWidget);
     screen.detach(devdepsWidget);
     screen.detach(githubWidget);
+    screen.detach(readme);
     screen.render();
   }
   return { show, hide };

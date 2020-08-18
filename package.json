@@ -21,6 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "blessed": "^0.1.81",
+    "blessed-contrib": "^4.8.20",
     "dayjs": "^1.8.33",
     "node-fetch": "^2.6.0",
     "node-pty": "^0.9.0",

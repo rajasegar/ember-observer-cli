@@ -6,10 +6,10 @@ module.exports = function (screen) {
   const devdepsWidget = blessed.box({
     parent: screen,
     label: ' Dev Dependencies ',
-    top: '70%+1',
+    top: '30%+1',
     left: '0',
     width: '35%',
-    height: '30%-3',
+    height: '20%',
     border: {
       type: 'line',
       fg: 'white',
@@ -26,6 +26,9 @@ module.exports = function (screen) {
       },
     },
     keys: true,
+    vi: true,
+    scrollable: true,
+    alwaysScroll: true,
     tags: true,
   });
 

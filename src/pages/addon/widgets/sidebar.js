@@ -23,9 +23,16 @@ module.exports = function (screen) {
           fg: 'yellow',
         },
       },
+      scrollbar: {
+        bg: 'red',
+        fg: 'blue',
+      },
     },
     keys: true,
+    vi: true,
     tags: true,
+    scrollable: true,
+    alwaysScroll: true,
   });
 
   return sidebar;
