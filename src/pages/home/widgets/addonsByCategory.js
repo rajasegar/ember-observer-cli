@@ -8,8 +8,8 @@ const relativeTime = require('dayjs/plugin/relativeTime');
 
 dayjs.extend(relativeTime);
 
-module.exports = function (screen, category) {
-  const url = `https://emberobserver.com/api/v2/addons?filter[inCategory]=${category}&include=categories`;
+module.exports = function (screen, id, categoryName) {
+  const url = `https://emberobserver.com/api/v2/addons?filter[inCategory]=${id}&include=categories`;
 
   const addonsList = blessed.list({
     parent: screen,
@@ -32,7 +32,7 @@ module.exports = function (screen, category) {
         },
       },
     },
-    label: 'Addons',
+    label: ` ${categoryName} `,
     keys: true,
     vi: true,
     tags: true,
@@ -64,6 +64,9 @@ module.exports = function (screen, category) {
         return str;
       });
       addonsList.setItems(items);
+      addonsList.setLabel(
+        ` ${categoryName}: Displaying ${items.length} addons `
+      );
       screen.render();
     });
 

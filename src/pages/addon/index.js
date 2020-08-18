@@ -46,8 +46,12 @@ module.exports = function (screen, addon) {
     vi: true,
     style: {
       selected: {
-        bg: 'white',
+        bg: 'yellow',
         fg: 'black',
+      },
+      item: {
+        fg: 'black',
+        bg: 'white',
       },
     },
     commands: {
@@ -73,12 +77,11 @@ module.exports = function (screen, addon) {
           screen.render();
           terminal.focus();
 
-          terminal.key('Esc', () => {
+          terminal.key('escape', function () {
             terminal.detach();
-            screen.render();
           });
+
           terminal.pty.write(`${command}\r\n`);
-          //terminal.pty.write(`ls\r\n`);
         },
       },
       github: {
@@ -108,16 +111,14 @@ module.exports = function (screen, addon) {
           }
         },
       },
-      home: {
-        keys: ['h'],
-        callback: function () {
-          screen.render();
-        },
+      search: {
+        keys: ['/'],
+        callback: function () {},
       },
       quit: {
         keys: ['q'],
         callback: function () {
-          screen.render();
+          return screen.destroy();
         },
       },
     },
@@ -190,22 +191,6 @@ module.exports = function (screen, addon) {
       });
   }
 
-  function fetchDevDeps(id) {
-    // Show addon dependencies
-    const url = `https://emberobserver.com/api/v2/addon-dependencies?filter[addonVersionId]=${id}&sort=package`;
-
-    return fetch(url)
-      .then((res) => res.json())
-      .then((json) => {
-        return json.data
-          .filter((d) => d.attributes['dependency-type'] === 'devDependencies')
-          .map((d) => {
-            return d.attributes.package;
-          })
-          .join('\n');
-      });
-  }
-
   fetch(addonUrl)
     .then((res) => res.json())
     .then((json) => {
@@ -230,7 +215,7 @@ module.exports = function (screen, addon) {
         content += `Ranks #${ranking} of the addons\n\n`;
       }
       content += displayScore(score);
-      content += `{yellow-fg}Categories {/}\n\n`;
+      content += `{yellow-fg}Categories {/}: `;
 
       const categories = json.included.filter((d) => d.type === 'categories');
 
@@ -255,12 +240,6 @@ module.exports = function (screen, addon) {
       content += 'Are there meaningful tests? {bold}Yes{/}\n';
       content += 'Is the REAMDE filled out? {bold}Yes{/}\n';
       content += 'Does the addon have a build? {bold}Yes{/}\n';
-      content += '{yellow-fg}Dependencies{/}\n';
-      content +=
-        'Version <version> of this addon depends on the following addons:\n';
-
-      content += '{yellow-fg}Dev Dependencies{/}\n';
-      content += '{yellow-fg}Dependencies{/}\n';
 
       info.setContent(content);
       screen.render();

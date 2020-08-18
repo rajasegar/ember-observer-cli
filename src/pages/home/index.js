@@ -38,7 +38,7 @@ module.exports = function (screen) {
     const category = navbar.categories.find((c) => {
       return c.attributes.name === name;
     });
-    addonsByCategory = createCategoryWidget(screen, category.id);
+    addonsByCategory = createCategoryWidget(screen, category.id, name);
 
     topAddonsList.detach();
     rsaList.detach();
