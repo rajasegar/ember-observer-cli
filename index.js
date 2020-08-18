@@ -76,10 +76,22 @@ const footer = blessed.listbar({
       keys: ['q'],
       callback: function () {},
     },
+    home: {
+      keys: ['h'],
+      callback: function () {
+        if (searchPage) {
+          searchPage.detach();
+        }
+
+        homePage.hide();
+        homePage.show();
+      },
+    },
   },
 });
 
 const homePage = inithomePage(screen);
+let searchPage = null;
 
 text.key('tab', () => {
   homePage.navbar.focus();
@@ -88,7 +100,7 @@ text.key('tab', () => {
 text.on('submit', (data) => {
   if (data) {
     // search addon
-    const searchPage = initSearchPage(screen, data);
+    searchPage = initSearchPage(screen, data);
 
     homePage.hide();
     screen.append(searchPage);
@@ -99,11 +111,17 @@ text.on('submit', (data) => {
 });
 
 screen.key(['q'], () => {
-  return process.exit(0); // eslint-disable-line
+  return screen.destroy();
 });
 
 screen.key(['/'], () => {
   text.focus();
+});
+
+screen.key(['Esc'], () => {
+  if (screen.terminal) {
+    screen.terminal.detach();
+  }
 });
 
 screen.append(header);

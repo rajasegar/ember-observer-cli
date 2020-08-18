@@ -56,3 +56,13 @@ d => Go to the demo page of the addon
 n => Go to the npm page of the addon
 ```
 
+## FAQs
+
+### How do I quit this thing?
+Press `q` to quit the program from any screen.
+
+### How do I close the installation terminal once the installation is done?
+Press `Esc` to close the terminal window.
+
+
+

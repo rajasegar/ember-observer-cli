@@ -15,7 +15,7 @@ module.exports = function (screen, query) {
     top: '10%+1',
     left: '0',
     width: '100%',
-    height: '100%',
+    height: '90%-3',
     border: {
       type: 'line',
       fg: 'white',
