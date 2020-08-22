@@ -7,8 +7,8 @@ module.exports = function (screen) {
     parent: screen,
     label: ' {bold}Github{/} ',
     top: '10%+1',
-    left: '35%+1',
-    width: '35%',
+    left: '30%+1',
+    width: '20%',
     height: '20%',
     border: {
       type: 'line',

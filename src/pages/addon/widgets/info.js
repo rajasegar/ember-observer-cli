@@ -8,7 +8,7 @@ module.exports = function (screen, addon) {
     label: ` ${addon} `,
     top: '10%+1',
     left: '0',
-    width: '35%',
+    width: '30%',
     height: '20%',
     border: {
       type: 'line',

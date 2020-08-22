@@ -11,6 +11,7 @@ const { exec } = require('child_process');
 
 const _info = require('./widgets/info');
 const _githubWidget = require('./widgets/github');
+const _scoreWidget = require('./widgets/score');
 const _depsWidget = require('./widgets/deps');
 const _devdepsWidget = require('./widgets/devdeps');
 const _sidebar = require('./widgets/sidebar');
@@ -30,6 +31,7 @@ module.exports = function (screen, addon) {
   // Initialize widgets
   const info = _info(screen, addon);
   const githubWidget = _githubWidget(screen);
+  const scoreWidget = _scoreWidget(screen);
   const depsWidget = _depsWidget(screen);
   const devdepsWidget = _devdepsWidget(screen);
   const sidebar = _sidebar(screen);
@@ -227,6 +229,11 @@ module.exports = function (screen, addon) {
         content += `Ranks #${ranking} of the addons\n\n`;
       }
       content += displayScore(score);
+      scoreWidget.setDisplay(score);
+
+      scoreWidget.setOptions({
+        color: getScoreColor(score),
+      });
       content += `{yellow-fg}Categories {/}: `;
 
       const categories = json.included.filter((d) => d.type === 'categories');
@@ -320,6 +327,7 @@ module.exports = function (screen, addon) {
     screen.append(depsWidget);
     screen.append(devdepsWidget);
     screen.append(githubWidget);
+    screen.append(scoreWidget);
     screen.append(readme);
     readme.focus();
     screen.render();
@@ -332,6 +340,7 @@ module.exports = function (screen, addon) {
     screen.detach(depsWidget);
     screen.detach(devdepsWidget);
     screen.detach(githubWidget);
+    screen.detach(scoreWidget);
     screen.detach(readme);
     screen.render();
   }
