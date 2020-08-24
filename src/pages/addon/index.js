@@ -229,11 +229,12 @@ module.exports = function (screen, addon) {
         content += `Ranks #${ranking} of the addons\n\n`;
       }
       content += displayScore(score);
-      scoreWidget.setDisplay(score);
 
       scoreWidget.setOptions({
-        color: getScoreColor(score),
+        color: blessed.colors.hexToRGB(getScoreColor(score)),
       });
+
+      scoreWidget.setDisplay(score);
       content += `{yellow-fg}Categories {/}: `;
 
       const categories = json.included.filter((d) => d.type === 'categories');

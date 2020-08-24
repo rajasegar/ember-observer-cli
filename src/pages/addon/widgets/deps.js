@@ -7,8 +7,8 @@ module.exports = function (screen) {
     parent: screen,
     label: ' Dependencies ',
     top: '30%+1',
-    left: '35%+1',
-    width: '35%',
+    left: '30%+1',
+    width: '40%',
     height: '20%',
     border: {
       type: 'line',

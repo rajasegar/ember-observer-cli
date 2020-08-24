@@ -8,7 +8,7 @@ module.exports = function (screen) {
     label: ' Dev Dependencies ',
     top: '30%+1',
     left: '0',
-    width: '35%',
+    width: '30%',
     height: '20%',
     border: {
       type: 'line',

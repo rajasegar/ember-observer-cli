@@ -5,7 +5,7 @@ const blessed = require('blessed');
 module.exports = function (screen, addon) {
   const info = blessed.box({
     parent: screen,
-    label: ` ${addon} `,
+    label: ` {bold}${addon}{/} `,
     top: '10%+1',
     left: '0',
     width: '30%',
