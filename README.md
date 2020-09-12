@@ -24,6 +24,14 @@ You can also use the shorthand version
 eoc
 ```
 
+## Themes
+If you want to load `ember-observer-cli` with any preferred theme you can do so by passing `--theme` option :
+```
+ember-observer-cli --theme Gruvbox-Dark
+```
+
+You can find the list of themes in [blessed-themes](https://github.com/rajasegar/blessed-themes). The default theme applied is `Dracula` which is a dark theme.
+
 ## Screenshots
 
 ### Home
