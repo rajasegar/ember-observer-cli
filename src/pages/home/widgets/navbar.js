@@ -2,10 +2,14 @@
 
 const blessed = require('blessed');
 const fetch = require('node-fetch');
+const getTheme = require('../../../utils/getTheme');
 
 module.exports = function (screen) {
   const categoriesUrl =
     'https://emberobserver.com/api/v2/categories?include=subcategories,parent';
+  const theme = getTheme();
+
+  const { border, style } = theme.navbar;
 
   const navbar = blessed.list({
     parent: screen,
@@ -13,24 +17,11 @@ module.exports = function (screen) {
     left: 0,
     width: '30%',
     height: '90%-3',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
+    border,
     label: 'Categories',
     keys: true,
     vi: true,
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-    },
+    style,
     tags: true,
   });
 

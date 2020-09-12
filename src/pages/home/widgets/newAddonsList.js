@@ -4,6 +4,7 @@ const blessed = require('blessed');
 const fetch = require('node-fetch');
 const dayjs = require('dayjs');
 const relativeTime = require('dayjs');
+const getTheme = require('../../../utils/getTheme');
 
 dayjs.extend(relativeTime);
 
@@ -11,6 +12,8 @@ module.exports = function (screen) {
   const newAddonsUrl =
     'https://emberobserver.com/api/v2/addons?include=categories&page[limit]=10&sort=-publishedDate';
 
+  const theme = getTheme();
+  const { style, border } = theme.newAddonsList;
   // New  Addons List
   const newList = blessed.list({
     parent: screen,
@@ -18,21 +21,8 @@ module.exports = function (screen) {
     left: '30%+1',
     width: '70%',
     height: '30%-3',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-    },
+    border,
+    style,
     label: 'New Addons',
     keys: true,
     vi: true,
@@ -49,11 +39,13 @@ module.exports = function (screen) {
           'latest-version-date': updatedAt,
         } = a.attributes;
 
-        let str = '{red-fg}[?]{/red-fg} ';
-        str += '{yellow-fg}{bold}' + name + '{/} ';
+        let str = `{${theme.colors.normal.red}-fg}[?]{/} `;
+        str += `{${theme.colors.normal.yellow}-fg}{bold}` + name + '{/} ';
         str += description;
         str +=
-          ' {cyan-fg}{bold}Last Updated ' + dayjs(updatedAt).fromNow() + '{/}';
+          ` {${theme.colors.normal.cyan}-fg}{bold}Last Updated ` +
+          dayjs(updatedAt).fromNow() +
+          '{/}';
         return str;
       });
       newList.setItems(items);

@@ -5,6 +5,15 @@ const screen = blessed.screen({ fullUnicode: true });
 const inithomePage = require('./src/pages/home');
 const initSearchPage = require('./src/pages/search');
 
+const options = require('minimist')(process.argv.slice(2));
+const scheme = options.theme || 'Dracula';
+const colors = require(`blessed-themes/themes/${scheme}`);
+const theme = require('./src/styles')(colors.colors);
+
+const program = blessed.program();
+program.bg(theme.program.bg);
+program.fg(theme.program.fg);
+
 const header = blessed.box({
   parent: screen,
   content: 'Ember Observer CLI',
@@ -12,10 +21,8 @@ const header = blessed.box({
   left: 0,
   width: '30%',
   height: '10%',
-  border: {
-    type: 'line',
-    fg: 'white',
-  },
+  border: theme.header.border,
+  style: theme.header.style,
 });
 
 const searchBox = blessed.form({
@@ -24,10 +31,8 @@ const searchBox = blessed.form({
   left: '30%+1',
   width: '70%',
   height: '10%',
-  border: {
-    type: 'line',
-    fg: 'white',
-  },
+  border: theme.searchBox.border,
+  style: theme.searchBox.style,
   content: 'Search addons',
   keys: true,
 });
@@ -35,59 +40,15 @@ const text = blessed.textbox({
   parent: searchBox,
   mouse: true,
   keys: true,
-  fg: 'white',
-  border: {
-    type: 'line',
-    fg: 'white',
-  },
+  fg: theme.text.fg,
+  bg: theme.text.bg,
+  border: theme.text.border,
   height: 3,
   width: 80,
   left: 1,
   top: 1,
   name: 'text',
   inputOnFocus: true,
-});
-
-const auto = true;
-const footer = blessed.listbar({
-  parent: screen,
-  bottom: 0,
-  left: 0,
-  right: 0,
-  height: auto ? 'shrink' : 3,
-  mouse: true,
-  keys: true,
-  border: 'line',
-  vi: true,
-  style: {
-    selected: {
-      bg: 'white',
-      fg: 'black',
-    },
-  },
-  commands: {
-    search: {
-      keys: ['/'],
-      callback: function () {
-        screen.render();
-      },
-    },
-    quit: {
-      keys: ['q'],
-      callback: function () {},
-    },
-    home: {
-      keys: ['h'],
-      callback: function () {
-        if (searchPage) {
-          searchPage.detach();
-        }
-
-        homePage.hide();
-        homePage.show();
-      },
-    },
-  },
 });
 
 const homePage = inithomePage(screen);
@@ -111,7 +72,8 @@ text.on('submit', (data) => {
 });
 
 screen.key(['q'], () => {
-  return screen.destroy();
+  //return screen.destroy();
+  return process.exit(0); // eslint-disable-line
 });
 
 screen.key(['/'], () => {
@@ -126,7 +88,6 @@ screen.key(['Esc'], () => {
 
 screen.append(header);
 screen.append(searchBox);
-screen.append(footer);
 homePage.show();
 
 module.exports = screen;

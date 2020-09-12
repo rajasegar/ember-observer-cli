@@ -5,11 +5,15 @@ const fetch = require('node-fetch');
 const dayjs = require('dayjs');
 const getScoreColor = require('../../../utils/getScoreColor');
 const relativeTime = require('dayjs/plugin/relativeTime');
+const getTheme = require('../../../utils/getTheme');
 
 dayjs.extend(relativeTime);
 
 module.exports = function (screen, id, categoryName) {
   const url = `https://emberobserver.com/api/v2/addons?filter[inCategory]=${id}&include=categories`;
+
+  const theme = getTheme();
+  const { border, style } = theme.addonsByCategory;
 
   const addonsList = blessed.list({
     parent: screen,
@@ -17,21 +21,8 @@ module.exports = function (screen, id, categoryName) {
     left: '30%+1',
     width: '70%',
     height: '90%-3',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-    },
+    border,
+    style,
     label: ` ${categoryName} `,
     keys: true,
     vi: true,

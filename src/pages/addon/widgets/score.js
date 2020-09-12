@@ -1,8 +1,11 @@
 'use strict';
 
 const contrib = require('blessed-contrib');
+const getTheme = require('../../../utils/getTheme');
 
 module.exports = function (screen) {
+  const theme = getTheme();
+  const { border } = theme.box;
   const score = contrib.lcd({
     parent: screen,
     label: ' {bold}Score{/} ',
@@ -10,10 +13,8 @@ module.exports = function (screen) {
     left: '50%+1',
     width: '20%',
     height: '20%',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
+    border,
+    bg: theme.colors.primary.background,
     tags: true,
     segmentWidth: 0.06, // how wide are the segments in % so 50% = 0.5
     segmentInterval: 0.11, // spacing between the segments in % so 50% = 0.550% = 0.5

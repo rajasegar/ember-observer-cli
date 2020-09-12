@@ -1,33 +1,19 @@
 'use strict';
 
 const blessed = require('blessed');
+const getTheme = require('../../../utils/getTheme');
 
 module.exports = function (screen) {
+  const theme = getTheme();
+  const { border, style } = theme.box;
   const sidebar = blessed.box({
     parent: screen,
     top: '10%+1',
     left: '70%+1',
     width: '30%',
     height: '90%-3',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-      scrollbar: {
-        bg: 'red',
-        fg: 'blue',
-      },
-    },
+    border,
+    style,
     keys: true,
     vi: true,
     tags: true,

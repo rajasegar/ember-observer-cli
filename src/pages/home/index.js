@@ -5,6 +5,7 @@ module.exports = function (screen) {
   const navbar = require('./widgets/navbar')(screen);
   const rsaList = require('./widgets/rsaList')(screen);
   const newList = require('./widgets/newAddonsList')(screen);
+  const footer = require('./widgets/footer')(screen);
   const createCategoryWidget = require('./widgets/addonsByCategory');
   const initAddonPage = require('../../pages/addon/');
 
@@ -70,6 +71,7 @@ module.exports = function (screen) {
     navbar.detach();
     rsaList.detach();
     newList.detach();
+    footer.detach();
     if (addonsByCategory) {
       addonsByCategory.detach();
     }
@@ -81,6 +83,7 @@ module.exports = function (screen) {
     screen.append(topAddonsList);
     screen.append(rsaList);
     screen.append(newList);
+    screen.append(footer);
     navbar.focus();
   }
 

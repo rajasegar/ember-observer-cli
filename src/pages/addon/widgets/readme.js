@@ -1,8 +1,11 @@
 'use strict';
 
 const contrib = require('blessed-contrib');
+const getTheme = require('../../../utils/getTheme');
 
 module.exports = function (screen) {
+  const theme = getTheme();
+  const { border, style } = theme.box;
   const readme = contrib.markdown({
     parent: screen,
     label: ' README ',
@@ -10,21 +13,8 @@ module.exports = function (screen) {
     left: '0',
     width: '70%',
     height: '50%-4',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-    },
+    border,
+    style,
     keys: true,
     vi: true,
     scrollable: true,

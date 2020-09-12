@@ -6,6 +6,7 @@ const dayjs = require('dayjs');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const Terminal = require('../../widgets/terminal');
 const getScoreColor = require('../../utils/getScoreColor');
+const getTheme = require('../../utils/getTheme');
 const os = require('os');
 const { exec } = require('child_process');
 
@@ -37,27 +38,19 @@ module.exports = function (screen, addon) {
   const sidebar = _sidebar(screen);
   const readme = _readme(screen);
 
-  const auto = true;
+  const theme = getTheme();
+
   var bar = blessed.listbar({
     parent: screen,
     bottom: 0,
     left: 0,
     right: 0,
-    height: auto ? 'shrink' : 3,
+    height: 'shrink',
     mouse: true,
     keys: true,
     border: 'line',
     vi: true,
-    style: {
-      selected: {
-        bg: 'yellow',
-        fg: 'black',
-      },
-      item: {
-        fg: 'black',
-        bg: 'white',
-      },
-    },
+    style: theme.footer.style,
     commands: {
       install: {
         keys: ['i'],
@@ -147,15 +140,16 @@ module.exports = function (screen, addon) {
           'first-commit-date': firstCommit,
           'latest-commit-date': latestCommit,
         } = attributes;
+        const { blue, yellow } = theme.colors.normal;
         let content = '';
-        content += `Open Issues: {blue-fg}${issues}{/}\n`;
-        content += `Forks: {blue-fg}${forks}{/}\n`;
-        content += `Starred: {blue-fg}${stars}{/}\n`;
+        content += `Open Issues: {${blue}-fg}${issues}{/}\n`;
+        content += `Forks: {${blue}-fg}${forks}{/}\n`;
+        content += `Starred: {${blue}-fg}${stars}{/}\n`;
         content += `Contributors: \n`;
-        content += `latest commit: {yellow-fg}${dayjs(
+        content += `latest commit: {${yellow}-fg}${dayjs(
           latestCommit
         ).fromNow()}{/}\n`;
-        content += `first commit: {yellow-fg}${dayjs(
+        content += `first commit: {${yellow}-fg}${dayjs(
           firstCommit
         ).fromNow()}{/}\n`;
 
@@ -235,7 +229,7 @@ module.exports = function (screen, addon) {
       });
 
       scoreWidget.setDisplay(score);
-      content += `{yellow-fg}Categories {/}: `;
+      content += `{${theme.colors.normal.yellow}-fg}Categories {/}: `;
 
       const categories = json.included.filter((d) => d.type === 'categories');
 
@@ -260,16 +254,17 @@ module.exports = function (screen, addon) {
         screen.render();
       });
 
-      content += '\n{yellow-fg}Review{/}\n';
-      content += 'Manually reviewed on <date> for version <version>\n';
-      content += 'Are there meaningful tests? {bold}Yes{/}\n';
-      content += 'Is the REAMDE filled out? {bold}Yes{/}\n';
-      content += 'Does the addon have a build? {bold}Yes{/}\n';
+      //content += '\n{yellow-fg}Review{/}\n';
+      //content += 'Manually reviewed on <date> for version <version>\n';
+      //content += 'Are there meaningful tests? {bold}Yes{/}\n';
+      //content += 'Is the REAMDE filled out? {bold}Yes{/}\n';
+      //content += 'Does the addon have a build? {bold}Yes{/}\n';
 
       info.setContent(content);
       screen.render();
 
-      let sidebarContent = `{yellow-fg}{bold}Press "i" to install this addon{/}\n\n`;
+      const { yellow } = theme.colors.normal;
+      let sidebarContent = `{${yellow}-fg}{bold}Press "i" to install this addon{/}\n\n`;
 
       sidebarContent += `latest version from ${dayjs(
         latestVersion
@@ -277,18 +272,19 @@ module.exports = function (screen, addon) {
       sidebarContent += `-----------------------\n`;
       sidebarContent += `{bold}${downloads}{/} downloads in last month\n`;
       sidebarContent += `-----------------------\n`;
-      sidebarContent += `{yellow-fg}demo{/}\n`;
+      sidebarContent += `{${yellow}-fg}demo{/}\n`;
+      sidebarContent += `${demoUrl}\n`;
       sidebarContent += `-----------------------\n`;
-      sidebarContent += `{yellow-fg}repo{/}\n`;
+      sidebarContent += `{${yellow}-fg}repo{/}\n`;
       sidebarContent += `${repo}\n`;
       sidebarContent += `-----------------------\n`;
-      sidebarContent += `{yellow-fg}package{/}\n`;
+      sidebarContent += `{${yellow}-fg}package{/}\n`;
       sidebarContent += `${npmUrl}\n`;
       sidebarContent += `-----------------------\n`;
-      sidebarContent += `{yellow-fg}license{/}\n`;
+      sidebarContent += `{${yellow}-fg}license{/}\n`;
       sidebarContent += `${license}\n`;
       sidebarContent += `-----------------------\n`;
-      sidebarContent += '{yellow-fg}npm keywords{/}\n';
+      sidebarContent += `{${yellow}-fg}npm keywords{/}\n`;
       const keywords = json.included.filter((r) => r.type === 'keywords');
       sidebarContent += keywords.map((k) => k.attributes.keyword).join(',');
 
@@ -296,7 +292,7 @@ module.exports = function (screen, addon) {
 
       // Maintainers
       const maintainers = json.included.filter((r) => r.type === 'maintainers');
-      sidebarContent += `{yellow-fg}Maintainers (${maintainers.length}){/}\n`;
+      sidebarContent += `{${yellow}-fg}Maintainers (${maintainers.length}){/}\n`;
       sidebarContent += maintainers
         .map((v) => {
           return v.attributes.name;
@@ -305,7 +301,7 @@ module.exports = function (screen, addon) {
 
       sidebarContent += `\n-----------------------\n`;
       const versions = json.included.filter((r) => r.type === 'versions');
-      sidebarContent += `{yellow-fg}Versions (${versions.length}){/}\n`;
+      sidebarContent += `{${yellow}-fg}Versions (${versions.length}){/}\n`;
       sidebarContent += versions
         .map((v) => {
           const { version, released } = v.attributes;

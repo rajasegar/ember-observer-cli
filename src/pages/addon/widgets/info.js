@@ -1,8 +1,11 @@
 'use strict';
 
 const blessed = require('blessed');
+const getTheme = require('../../../utils/getTheme');
 
 module.exports = function (screen, addon) {
+  const theme = getTheme();
+  const { border, style } = theme.box;
   const info = blessed.box({
     parent: screen,
     label: ` {bold}${addon}{/} `,
@@ -10,21 +13,8 @@ module.exports = function (screen, addon) {
     left: '0',
     width: '30%',
     height: '20%',
-    border: {
-      type: 'line',
-      fg: 'white',
-    },
-    style: {
-      selected: {
-        fg: 'black',
-        bg: 'white',
-      },
-      focus: {
-        border: {
-          fg: 'yellow',
-        },
-      },
-    },
+    border,
+    style,
     keys: true,
     tags: true,
   });
