@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
-    "debug": "node --inspect-brk ./bin/cli.js"
+    "debug": "node --inspect-brk ./bin/cli.js",
+    "deploy": "git push && git push --tags && npm publish"
   },
   "keywords": [
     "cli",
@@ -22,7 +23,7 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.20",
-    "blessed-themes": "^1.0.2",
+    "blessed-themes": "^1.1.0",
     "dayjs": "^1.8.33",
     "minimist": "^1.2.5",
     "node-fetch": "^2.6.0",
